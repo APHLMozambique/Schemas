@@ -297,9 +297,6 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-
-
--- select * from OpenLDRDict.[dbo].[viewFacilities] 
 CREATE VIEW [dbo].[viewVLData]
 AS 
 
