@@ -29,9 +29,6 @@
 CREATE DATABASE ViralLoadData  
 COLLATE SQL_Latin1_General_CP1_CI_AS;
 
-
-USE [ViralLoadData]
-GO
 /****** Object:  Table [dbo].[VlData]    Script Date: 8/14/2019 1:42:11 PM ******/
 SET ANSI_NULLS ON
 GO
