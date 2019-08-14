@@ -1,4 +1,4 @@
-{
+/*{
   "name": "updater",
   "version": "1.0.0",
   "description": "A minimal Electron application",
@@ -24,7 +24,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "update-electron-app": "^1.5.0"
   }
-}
+}*/
 
 CREATE DATABASE ViralLoadData  
 COLLATE SQL_Latin1_General_CP1_CI_AS;
