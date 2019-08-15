@@ -374,3 +374,29 @@ SELECT [RequestID]
 
 
 GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[VersionControl](
+	[DateTimeStamp] [datetime] NULL,
+	[VersionActivationDate] [datetime] NULL,
+	[VERBase] [int] NULL,
+	[VERUpdate] [int] NULL,
+	[VERBuild] [int] NULL,
+	[VersionStamp] [varchar](20) NULL
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.0')
+GO
