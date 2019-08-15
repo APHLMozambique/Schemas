@@ -1,30 +1,4 @@
-/*{
-  "name": "updater",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/APHLMozambique/updater",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "electron": "^5.0.7"
-  },
-  "dependencies": {
-    "electron-log": "^3.0.6",
-    "electron-squirrel-startup": "^1.0.0",
-    "update-electron-app": "^1.5.0"
-  }
-}*/
+
 
 CREATE DATABASE ViralLoadData  
 COLLATE SQL_Latin1_General_CP1_CI_AS;
