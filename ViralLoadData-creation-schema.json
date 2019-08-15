@@ -1,5 +1,9 @@
 IF EXISTS(select * from sys.databases where name='ViralLoadData')
-DROP DATABASE ViralLoadData
+BEGIN
+	EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'ViralLoadData'
+	ALTER DATABASE [ViralLoadData] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE
+	DROP DATABASE [ViralLoadData]
+END
 GO
 CREATE DATABASE ViralLoadData  
 COLLATE SQL_Latin1_General_CP1_CI_AS;
