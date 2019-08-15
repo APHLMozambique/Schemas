@@ -1,3 +1,6 @@
+IF EXISTS(select * from sys.databases where name='ViralLoadData')
+DROP DATABASE ViralLoadData
+GO
 CREATE DATABASE ViralLoadData  
 COLLATE SQL_Latin1_General_CP1_CI_AS;
 GO
