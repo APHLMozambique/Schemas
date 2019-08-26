@@ -1,5 +1,3 @@
-
-
 IF EXISTS(select * from sys.databases where name='OpenLDRData')
 BEGIN
 	EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'OpenLDRData'
