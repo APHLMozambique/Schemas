@@ -278,5 +278,6 @@ END;
 GO
 
 
-INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
+INSERT INTO [OpenLDRData].[dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
+
 GO
