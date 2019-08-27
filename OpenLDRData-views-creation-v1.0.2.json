@@ -45,7 +45,7 @@ SELECT
 	LABNO.LIMSRptResult AS RequestingClinician, 
 	CONSE.LIMSRptResult AS ConsentimentoParaContacto, 
 	LABLO.LIMSRptResult AS LocalDeColheita, 
-	dbo.GetReasonForTest(motivo.LIMSRptResult) AS ReasonForTest, 
+	OpenLDRData.dbo.GetReasonForTest(motivo.LIMSRptResult) AS ReasonForTest, 
 	req.DateTimeStamp, req.Versionstamp, req.LIMSDateTimeStamp, req.LIMSVersionstamp,
 	req.LOINCPanelCode,  req.HL7PriorityCode, req.AdmitAttendDateTime, req.CollectionVolume, 
 	req.LIMSFacilityCode, limsFacility.[Description] AS LIMSFacilityName, limsFacility.ProvinceName AS LIMSProvinceName, limsFacility.DistrictName AS LIMSDistrictName,
@@ -60,52 +60,52 @@ SELECT
 	req.Repeated
 FROM Requests AS req
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'ENCON' -- Pregnant
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'ENCON' -- Pregnant
 ) AS preg ON req.RequestID = preg.RequestID AND req.OBRSetID = preg.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'AMAME' -- Breast Feeding
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'AMAME' -- Breast Feeding
 ) AS bf ON req.RequestID = bf.RequestID AND req.OBRSetID = bf.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRAP' -- First time
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'VIRAP' -- First time
 ) AS ft ON req.RequestID = ft.RequestID AND req.OBRSetID = ft.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABDA' -- Collection Day
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'LABDA' -- Collection Day
 ) AS cday ON req.RequestID = cday.RequestID AND req.OBRSetID = cday.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABHO' -- Collection Hour
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'LABHO' -- Collection Hour
 ) AS ctime ON req.RequestID = ctime.RequestID AND req.OBRSetID = ctime.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVD' -- Data de in¡cio do TARV
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'TARVD' -- Data de in¡cio do TARV
 ) AS tarvd ON req.RequestID = tarvd.RequestID AND req.OBRSetID = tarvd.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVP' -- Primeira Linha
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'TARVP' -- Primeira Linha
 ) AS tarvp ON req.RequestID = tarvp.RequestID AND req.OBRSetID = tarvp.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVS' -- 
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'TARVS' -- 
 ) AS tarvs ON req.RequestID = tarvs.RequestID AND req.OBRSetID = tarvs.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'ESCOL' --		Motivo da Requerimento
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'ESCOL' --		Motivo da Requerimento
 ) AS motivo ON req.RequestID = motivo.RequestID AND req.OBRSetID = motivo.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVQ' --		ART Regimen
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'TARVQ' --		ART Regimen
 ) AS TARVQ ON req.RequestID = TARVQ.RequestID AND req.OBRSetID = TARVQ.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABTI' --		Type of Sample Collection
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'LABTI' --		Type of Sample Collection
 ) AS LABTI ON req.RequestID = LABTI.RequestID AND req.OBRSetID = LABTI.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRAD' --		Last Viral Load Date
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'VIRAD' --		Last Viral Load Date
 ) AS VIRAD ON req.RequestID = VIRAD.RequestID AND req.OBRSetID = VIRAD.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRR1' --		Last Viral Load Result
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'VIRR1' --		Last Viral Load Result
 ) AS VIRR1 ON req.RequestID = VIRR1.RequestID AND req.OBRSetID = VIRR1.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABNO' --		Requesting Clinician
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'LABNO' --		Requesting Clinician
 ) AS LABNO ON req.RequestID = LABNO.RequestID AND req.OBRSetID = LABNO.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'CONSE' -- CONSE Consentimento para contacto
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'CONSE' -- CONSE Consentimento para contacto
 ) AS CONSE ON req.RequestID = CONSE.RequestID AND req.OBRSetID = CONSE.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABLO' --	LABLO Local de colheita
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'LABLO' --	LABLO Local de colheita
 ) AS LABLO ON req.RequestID = LABLO.RequestID AND req.OBRSetID = LABLO.OBRSetID
 LEFT JOIN OpenLDRDict.dbo.viewFacilities AS limsFacility ON req.LIMSFacilityCode = limsFacility.FacilityCode
 LEFT JOIN OpenLDRDict.dbo.viewFacilities AS requestingFacility ON req.RequestingFacilityCode = requestingFacility.FacilityCode
@@ -130,10 +130,10 @@ AS
 SELECT 
 	req.RequestID, req.OBRSetID, req.LIMSPanelCode, req.LIMSPanelDesc, req.AuthorisedDateTime AS HIVVL_AuthorisedDateTime, 
 	req.LIMSRejectionCode AS HIVVL_LIMSRejectionCode, req.LIMSRejectionDesc AS HIVVL_LIMSRejectionDesc,
-	[dbo].[ViralLoadResultMerge](hivvd.LIMSRptResult,hivvd.LIMSCodedValue) AS HIVVL_ViralLoadResult, 
-	[dbo].[ViralLoadResultMerge](hivvr.LIMSRptResult,hivvr.LIMSCodedValue) AS HIVVL_ViralLoadCAPCTM, 
-	[dbo].[ViralLoadResultMerge](hivvc.LIMSRptResult,hivvc.LIMSCodedValue) AS HIVVL_Low_value, 
-	[dbo].[ViralLoadResultMerge](hivvf.LIMSRptResult,hivvf.LIMSCodedValue) AS HIVVL_Viral, 
+	OpenLDRData.[dbo].[ViralLoadResultMerge](hivvd.LIMSRptResult,hivvd.LIMSCodedValue) AS HIVVL_ViralLoadResult, 
+	OpenLDRData.[dbo].[ViralLoadResultMerge](hivvr.LIMSRptResult,hivvr.LIMSCodedValue) AS HIVVL_ViralLoadCAPCTM, 
+	OpenLDRData.[dbo].[ViralLoadResultMerge](hivvc.LIMSRptResult,hivvc.LIMSCodedValue) AS HIVVL_Low_value, 
+	OpenLDRData.[dbo].[ViralLoadResultMerge](hivvf.LIMSRptResult,hivvf.LIMSCodedValue) AS HIVVL_Viral, 
 	hivrl.LIMSRptResult AS HIVVL_VRLogValue,
 	req.AgeInYears, req.AgeInDays, req.HL7SexCode, 
 	req.SpecimenDatetime, req.RegisteredDateTime, req.ReceivedDateTime, req.AuthorisedDateTime, req.AnalysisDateTime, req.LIMSRejectionCode, req.LIMSRejectionDesc, 
@@ -150,19 +150,19 @@ SELECT
 	req.ReferringRequestID, req.Therapy, req.LIMSAnalyzerCode, req.TargetTimeDays, req.TargetTimeMins, req.Repeated
 FROM Requests AS req
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVD' -- CAP/CTM
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'HIVVD' -- CAP/CTM
 ) AS hivvd ON req.RequestID = hivvd.RequestID AND req.OBRSetID = hivvd.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVR' -- Viral Load Result
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'HIVVR' -- Viral Load Result
 ) AS hivvr ON req.RequestID = hivvr.RequestID AND req.OBRSetID = hivvr.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVC' -- HIV : Viral load (low value) 
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'HIVVC' -- HIV : Viral load (low value) 
 ) AS hivvc ON req.RequestID = hivvc.RequestID AND req.OBRSetID = hivvc.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVF' -- HIV Viral
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'HIVVF' -- HIV Viral
 ) AS hivvf ON req.RequestID = hivvf.RequestID AND req.OBRSetID = hivvf.OBRSetID
 LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVRL' -- Log Value
+	SELECT * FROM OpenLDRData.[dbo].LabResults WHERE LIMSObservationCode = 'HIVRL' -- Log Value
 ) AS hivrl ON req.RequestID = hivrl.RequestID AND req.OBRSetID = hivrl.OBRSetID
 LEFT JOIN OpenLDRDict.dbo.viewFacilities AS limsFacility ON req.LIMSFacilityCode = limsFacility.FacilityCode
 LEFT JOIN OpenLDRDict.dbo.viewFacilities AS requestingFacility ON req.RequestingFacilityCode = requestingFacility.FacilityCode
@@ -208,9 +208,9 @@ SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, res
  result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
  result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
  result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
+ OpenLDRData.[dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
  result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
+ OpenLDRData.[dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
  result.AgeInYears,
  IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
  CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
@@ -280,16 +280,16 @@ SELECT patients.RequestID, patients.Versionstamp, patients.[REFNO],patients.[REG
  result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
  result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
  result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
+ OpenLDRData.[dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
  result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
+ OpenLDRData.[dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
  result.AgeInYears,
  IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
  CONCAT(YEAR(result.RegisteredDateTime), '-', DATEPART(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
  CONCAT(YEAR(result.RegisteredDateTime), '-', Month(result.RegisteredDateTime)) AS RegisteredYearAndMonth,
   --- New Lines
  IIF(info.DateTimeStamp IS NULL OR result.DateTimeStamp IS NULL, ISNULL(info.DateTimeStamp,result.DateTimeStamp), IIF(info.DateTimeStamp < result.DateTimeStamp, info.DateTimeStamp, result.DateTimeStamp)) AS DateTimeStamp,
- dbo.[getHealthCareCode] (result.RequestingFacilityCode) AS HealthcareDistrictCode,
+ OpenLDRData.[dbo].[getHealthCareCode] (result.RequestingFacilityCode) AS HealthcareDistrictCode,
  fac.HealthCareID AS FullHealthCareID
 FROM
 -- First get a listing of all RequestIDs that look like they had an actual viral load test requested
@@ -351,9 +351,9 @@ SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, res
  result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
  result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
  result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
+ OpenLDRData.[dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
  result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
+ OpenLDRData.[dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
  result.AgeInYears,
  IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
  CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
@@ -424,9 +424,9 @@ SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, res
  result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
  result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
  result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
-  [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
+ OpenLDRData.[dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
  result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM,  
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
+ OpenLDRData.[dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
  result.AgeInYears,
  IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
  CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
