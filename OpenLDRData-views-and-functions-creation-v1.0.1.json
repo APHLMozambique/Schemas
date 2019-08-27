@@ -6,7 +6,7 @@ BEGIN
 END
 GO
 
-USE [master]
+USE [OpenLDRData]
 GO
 /****** Object:  UserDefinedFunction [dbo].[GetAgeGroup]    Script Date: 27/08/2019 09:09:35 ******/
 SET ANSI_NULLS ON
@@ -15,7 +15,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE FUNCTION [OpenLDRData].[dbo].[GetAgeGroup] (@InString Int)
+CREATE FUNCTION [dbo].[GetAgeGroup] (@InString Int)
 RETURNS nvarchar(64)
 WITH EXECUTE AS CALLER
 AS
@@ -54,7 +54,7 @@ GO
 -- ALTER date: <ALTER Date, ,>
 -- Description:	<Description, ,>
 -- =============================================
-CREATE FUNCTION [OpenLDRData].[dbo].[getHealthCareCode]
+CREATE FUNCTION [dbo].[getHealthCareCode]
 (
 	-- Add the parameters for the function here
 	@facilityCode varchar(20)
@@ -82,7 +82,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE FUNCTION [OpenLDRData].[dbo].[GetReasonForTest] (@InString nvarchar(1024))
+CREATE FUNCTION [dbo].[GetReasonForTest] (@InString nvarchar(1024))
 RETURNS nvarchar(64)
 WITH EXECUTE AS CALLER
 AS
@@ -118,7 +118,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE FUNCTION [OpenLDRData].[dbo].[getRequestIDsWithUpdatedDateTimeStamp](@startDate date, @endDate date)
+CREATE FUNCTION [dbo].[getRequestIDsWithUpdatedDateTimeStamp](@startDate date, @endDate date)
 RETURNS @requestIDs TABLE (
    RequestID nvarchar(26) PRIMARY KEY CLUSTERED
 ) 
@@ -151,7 +151,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE FUNCTION [OpenLDRData].[dbo].[IfEmptyReturnValue] (@InString nvarchar(1024), @ReturnIfEmpty nvarchar(1024))
+CREATE FUNCTION [dbo].[IfEmptyReturnValue] (@InString nvarchar(1024), @ReturnIfEmpty nvarchar(1024))
 RETURNS nvarchar(1024)
 WITH EXECUTE AS CALLER
 AS
@@ -188,7 +188,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE FUNCTION [OpenLDRData].[dbo].[ViralLoadResultMerge] (
+CREATE FUNCTION [dbo].[ViralLoadResultMerge] (
 				@HIVVL_Result nvarchar(1024),
 				@LIMSCodedValue nvarchar(1024)
 			--@PCR_ViralLoadCAPCTM nvarchar(1024)
@@ -227,7 +227,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE FUNCTION [OpenLDRData].[dbo].[ViralLoadResultRange] (
+CREATE FUNCTION [dbo].[ViralLoadResultRange] (
 			@HIVVL_ViralLoadResult nvarchar(1024), 
 			@HIVVL_ViralLoadCAPCTM nvarchar(1024)
 			--@PCR_ViralLoadCAPCTM nvarchar(1024)
@@ -281,5 +281,5 @@ END;
 GO
 
 
-INSERT INTO [OpenLDRData].[dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
+INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
 GO
