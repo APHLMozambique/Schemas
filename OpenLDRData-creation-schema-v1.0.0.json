@@ -237,3 +237,7 @@ CREATE TABLE [dbo].[VersionControl](
 GO
 SET ANSI_PADDING OFF
 GO
+
+INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.0')
+GO
+
