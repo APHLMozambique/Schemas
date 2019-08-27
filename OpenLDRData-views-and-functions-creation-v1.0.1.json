@@ -773,3 +773,6 @@ LEFT JOIN viewVL_Info AS info ON result.RequestID = info.RequestID -- AND result
 
 
 GO
+
+INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
+GO
