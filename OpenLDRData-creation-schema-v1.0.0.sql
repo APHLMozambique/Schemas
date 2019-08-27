@@ -1004,3 +1004,7 @@ LEFT JOIN viewVL_Info AS info ON result.RequestID = info.RequestID -- AND result
 
 
 GO
+
+INSERT INTO [OpenLDRData].[dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.0')
+
+GO
