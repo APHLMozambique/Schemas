@@ -15,7 +15,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-CREATE FUNCTION [dbo].[GetAgeGroup] (@InString Int)
+CREATE FUNCTION [dbo].[GetAgeGroup] ( @InString Int )
 RETURNS nvarchar(64)
 WITH EXECUTE AS CALLER
 AS
@@ -23,7 +23,7 @@ BEGIN
     -- notice the spaces before the age groups to help with sorting
     DECLARE @OutString nvarchar(64);
 
-    IF (@InString Is Null) BEGIN
+    IF ( @InString Is Null ) BEGIN
         SET @OutString = 'No Age Specified';
     END ELSE BEGIN
 		SET @OutString = 
@@ -95,11 +95,11 @@ BEGIN
     END ELSE BEGIN
 		SET @OutString = 
 	        CASE 
-			WHEN @InString = 'Nao Prenchido' THEN 'Not Specified'
-			WHEN @InString = 'Suspect treatment failure' THEN 'Suspected treatment failure'
-			WHEN @InString = 'Repiticas apos AMA' THEN 'Repeat after breastfeeding'
-			WHEN @InString = 'Rotina' THEN 'Routine'
-			WHEN @InString = '' THEN 'Reason Not Specified'
+				WHEN @InString = 'Nao Prenchido' THEN 'Not Specified'
+				WHEN @InString = 'Suspect treatment failure' THEN 'Suspected treatment failure'
+				WHEN @InString = 'Repiticas apos AMA' THEN 'Repeat after breastfeeding'
+				WHEN @InString = 'Rotina' THEN 'Routine'
+				WHEN @InString = '' THEN 'Reason Not Specified'
 			ELSE @InString
 		    END;
     END;
@@ -182,7 +182,6 @@ END;
 
 
 GO
-
 /****** Object:  UserDefinedFunction [dbo].[ViralLoadResultMerge]    Script Date: 27/08/2019 09:09:35 ******/
 SET ANSI_NULLS ON
 GO
@@ -204,7 +203,7 @@ BEGIN
     DECLARE @OutString nvarchar(1024);
 	DECLARE @results TABLE(Code varchar(50), Value varchar(100))
 
-	INSERT INTO @results VAlUES('TND','Nivel de detecçao baixo'),('LDL', 'Nivel de detecçao baixo'),('NEG', 'Negativo'),('POS','Positivo'),('I','Indeterminado')
+	INSERT INTO @results VAlUES('TND','Nivel de detecçao baixo') , ('LDL', 'Nivel de detecçao baixo') , ('NEG', 'Negativo') , ('POS','Positivo') , ('I','Indeterminado')
 
 	IF (@HIVVL_Result Is Null OR @HIVVL_Result = '') BEGIN
 		SELECT @OutString = ISNULL(Value, @LIMSCodedValue) FROM @results WHERE Code = @LIMSCodedValue
@@ -229,9 +228,9 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE FUNCTION [dbo].[ViralLoadResultRange] (
-			@HIVVL_ViralLoadResult nvarchar(1024), 
-			@HIVVL_ViralLoadCAPCTM nvarchar(1024)
-			--@PCR_ViralLoadCAPCTM nvarchar(1024)
+				@HIVVL_ViralLoadResult nvarchar(1024), 
+				@HIVVL_ViralLoadCAPCTM nvarchar(1024)
+				--@PCR_ViralLoadCAPCTM nvarchar(1024)
 			)
 RETURNS nvarchar(1024)
 WITH EXECUTE AS CALLER
@@ -276,458 +275,7 @@ BEGIN
     RETURN(@OutString);
 
 END;
-
-
-
 GO
-/****** Object:  View [dbo].[viewVL_Info]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE VIEW [dbo].[viewVL_Info]
-AS 
--- This view grabs the request and extra registration information related to LIMSObservationCode = VIRAL
--- 24-Jul-19 Brett Staib - Added new info fields being added through VIRAL panel CONSE, LABLO
-SELECT 
-	req.RequestID, req.OBRSetID, req.LIMSPanelCode, req.LIMSPanelDesc, req.AgeInYears, req.AgeInDays, req.HL7SexCode, 
-	req.SpecimenDatetime, req.RegisteredDateTime, req.ReceivedDateTime, req.AuthorisedDateTime, req.AnalysisDateTime, req.LIMSRejectionCode, req.LIMSRejectionDesc, 
-	CASE WHEN preg.LIMSRptResult Is Null THEN 'Unreported'
-		ELSE preg.LIMSRptResult
-	END AS Pregnant, -- preg.LIMSObservationCode,
-	CASE WHEN bf.LIMSRptResult Is Null THEN 'Unreported'
-		ELSE bf.LIMSRptResult
-	END AS BreastFeeding, -- bf.LIMSObservationCode,
-	CASE WHEN ft.LIMSRptResult Is Null THEN 'Unreported'
-		ELSE ft.LIMSRptResult
-	END AS FirstTime, -- ft.LIMSObservationCode,
-	CASE WHEN cday.LIMSRptResult Is Null THEN 'Unreported'
-		ELSE cday.LIMSRptResult
-	END AS CollectedDate, -- cday.LIMSObservationCode,
-	ctime.LIMSRptResult AS CollectedTime, -- ctime.LIMSObservationCode,
-	tarvd.LIMSRptResult AS DataDeInicioDoTARV, -- tarvd.LIMSObservationCode,
-	tarvp.LIMSRptResult AS PrimeiraLinha, -- tarvp.LIMSObservationCode,
-	tarvs.LIMSRptResult AS SegundaLinha, -- tarvs.LIMSObservationCode,
-	TARVQ.LIMSRptResult AS ARTRegimen,
-	LABTI.LIMSRptResult AS TypeOfSampleCollection, 
-	VIRAD.LIMSRptResult AS LastViralLoadDate, 
-	VIRR1.LIMSRptResult AS LastViralLoadResult, 
-	LABNO.LIMSRptResult AS RequestingClinician, 
-	CONSE.LIMSRptResult AS ConsentimentoParaContacto, 
-	LABLO.LIMSRptResult AS LocalDeColheita, 
-	dbo.GetReasonForTest(motivo.LIMSRptResult) AS ReasonForTest, 
-	req.DateTimeStamp, req.Versionstamp, req.LIMSDateTimeStamp, req.LIMSVersionstamp,
-	req.LOINCPanelCode,  req.HL7PriorityCode, req.AdmitAttendDateTime, req.CollectionVolume, 
-	req.LIMSFacilityCode, limsFacility.[Description] AS LIMSFacilityName, limsFacility.ProvinceName AS LIMSProvinceName, limsFacility.DistrictName AS LIMSDistrictName,
-	req.RequestingFacilityCode, requestingFacility.[Description] AS RequestingFacilityName, requestingFacility.ProvinceName AS RequestingProvinceName, requestingFacility.DistrictName AS RequestingDistrictName,
-	req.ReceivingFacilityCode, receivingFacility.[Description] AS ReceivingFacilityName, receivingFacility.ProvinceName AS ReceivingProvinceName, receivingFacility.DistrictName AS ReceivingDistrictName,
-	req.TestingFacilityCode, testingFacility.[Description] AS TestingFacilityName, testingFacility.ProvinceName AS testingProvinceName, testingFacility.DistrictName AS TestingDistrictName,
-	req.LIMSPointOfCareDesc, req.RequestTypeCode, req.ICD10ClinicalInfoCodes, req.ClinicalInfo, req.HL7SpecimenSourceCode, req.LIMSSpecimenSourceCode, 
-	req.LIMSSpecimenSourceDesc, req.HL7SpecimenSiteCode, req.LIMSSpecimenSiteCode, req.LIMSSpecimenSiteDesc, req.WorkUnits, req.CostUnits, 
-	req.HL7SectionCode, req.HL7ResultStatusCode, req.RegisteredBy, req.TestedBy, req.AuthorisedBy, req.OrderingNotes, req.EncryptedPatientID, 
-	req.HL7EthnicGroupCode, req.Deceased, req.Newborn, req.HL7PatientClassCode, req.AttendingDoctor, req.ReferringRequestID, 
-	req.Therapy, req.LIMSAnalyzerCode, req.TargetTimeDays, req.TargetTimeMins, 
-	req.Repeated
-FROM Requests AS req
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'ENCON' -- Pregnant
-) AS preg ON req.RequestID = preg.RequestID AND req.OBRSetID = preg.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'AMAME' -- Breast Feeding
-) AS bf ON req.RequestID = bf.RequestID AND req.OBRSetID = bf.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRAP' -- First time
-) AS ft ON req.RequestID = ft.RequestID AND req.OBRSetID = ft.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABDA' -- Collection Day
-) AS cday ON req.RequestID = cday.RequestID AND req.OBRSetID = cday.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABHO' -- Collection Hour
-) AS ctime ON req.RequestID = ctime.RequestID AND req.OBRSetID = ctime.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVD' -- Data de in¡cio do TARV
-) AS tarvd ON req.RequestID = tarvd.RequestID AND req.OBRSetID = tarvd.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVP' -- Primeira Linha
-) AS tarvp ON req.RequestID = tarvp.RequestID AND req.OBRSetID = tarvp.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVS' -- 
-) AS tarvs ON req.RequestID = tarvs.RequestID AND req.OBRSetID = tarvs.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'ESCOL' --		Motivo da Requerimento
-) AS motivo ON req.RequestID = motivo.RequestID AND req.OBRSetID = motivo.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'TARVQ' --		ART Regimen
-) AS TARVQ ON req.RequestID = TARVQ.RequestID AND req.OBRSetID = TARVQ.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABTI' --		Type of Sample Collection
-) AS LABTI ON req.RequestID = LABTI.RequestID AND req.OBRSetID = LABTI.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRAD' --		Last Viral Load Date
-) AS VIRAD ON req.RequestID = VIRAD.RequestID AND req.OBRSetID = VIRAD.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'VIRR1' --		Last Viral Load Result
-) AS VIRR1 ON req.RequestID = VIRR1.RequestID AND req.OBRSetID = VIRR1.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABNO' --		Requesting Clinician
-) AS LABNO ON req.RequestID = LABNO.RequestID AND req.OBRSetID = LABNO.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'CONSE' -- CONSE Consentimento para contacto
-) AS CONSE ON req.RequestID = CONSE.RequestID AND req.OBRSetID = CONSE.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'LABLO' --	LABLO Local de colheita
-) AS LABLO ON req.RequestID = LABLO.RequestID AND req.OBRSetID = LABLO.OBRSetID
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS limsFacility ON req.LIMSFacilityCode = limsFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS requestingFacility ON req.RequestingFacilityCode = requestingFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS receivingFacility ON req.ReceivingFacilityCode = receivingFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS testingFacility ON req.TestingFacilityCode = testingFacility.FacilityCode
-WHERE req.LIMSPanelCode = 'VIRAL'
-
-
-
-GO
-/****** Object:  View [dbo].[viewVL_Result]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE VIEW [dbo].[viewVL_Result]
-AS 
--- This view grabs the request and a little extra information about LIMSObservationCode = HIVVL
--- This query may eventually need to have some other technical information added like unit and reference ranges but for now just keeping it simple
-SELECT 
-	req.RequestID, req.OBRSetID, req.LIMSPanelCode, req.LIMSPanelDesc, req.AuthorisedDateTime AS HIVVL_AuthorisedDateTime, 
-	req.LIMSRejectionCode AS HIVVL_LIMSRejectionCode, req.LIMSRejectionDesc AS HIVVL_LIMSRejectionDesc,
-	[dbo].[ViralLoadResultMerge](hivvd.LIMSRptResult,hivvd.LIMSCodedValue) AS HIVVL_ViralLoadResult, 
-	[dbo].[ViralLoadResultMerge](hivvr.LIMSRptResult,hivvr.LIMSCodedValue) AS HIVVL_ViralLoadCAPCTM, 
-	[dbo].[ViralLoadResultMerge](hivvc.LIMSRptResult,hivvc.LIMSCodedValue) AS HIVVL_Low_value, 
-	[dbo].[ViralLoadResultMerge](hivvf.LIMSRptResult,hivvf.LIMSCodedValue) AS HIVVL_Viral, 
-	hivrl.LIMSRptResult AS HIVVL_VRLogValue,
-	req.AgeInYears, req.AgeInDays, req.HL7SexCode, 
-	req.SpecimenDatetime, req.RegisteredDateTime, req.ReceivedDateTime, req.AuthorisedDateTime, req.AnalysisDateTime, req.LIMSRejectionCode, req.LIMSRejectionDesc, 
-	req.DateTimeStamp, req.Versionstamp, req.LIMSDateTimeStamp, req.LIMSVersionstamp,
-	req.LOINCPanelCode,  req.HL7PriorityCode, req.AdmitAttendDateTime, req.CollectionVolume, 
-	req.LIMSFacilityCode, limsFacility.[Description] AS LIMSFacilityName, limsFacility.ProvinceName AS LIMSProvinceName, limsFacility.DistrictName AS LIMSDistrictName,
-	req.RequestingFacilityCode, requestingFacility.[Description] AS RequestingFacilityName, requestingFacility.ProvinceName AS RequestingProvinceName, requestingFacility.DistrictName AS RequestingDistrictName,
-	req.ReceivingFacilityCode, receivingFacility.[Description] AS ReceivingFacilityName, receivingFacility.ProvinceName AS ReceivingProvinceName, receivingFacility.DistrictName AS ReceivingDistrictName,
-	req.TestingFacilityCode, testingFacility.[Description] AS TestingFacilityName, testingFacility.ProvinceName AS testingProvinceName, testingFacility.DistrictName AS TestingDistrictName,
-	req.LIMSPointOfCareDesc, req.RequestTypeCode, req.ICD10ClinicalInfoCodes, req.ClinicalInfo, req.HL7SpecimenSourceCode, req.LIMSSpecimenSourceCode, 
-	req.LIMSSpecimenSourceDesc, req.HL7SpecimenSiteCode, req.LIMSSpecimenSiteCode, req.LIMSSpecimenSiteDesc, req.WorkUnits, req.CostUnits, 
-	req.HL7SectionCode, req.HL7ResultStatusCode, req.RegisteredBy, req.TestedBy, req.AuthorisedBy, req.OrderingNotes, req.EncryptedPatientID, 
-	req.HL7EthnicGroupCode, req.Deceased, req.Newborn, req.HL7PatientClassCode, req.AttendingDoctor, 
-	req.ReferringRequestID, req.Therapy, req.LIMSAnalyzerCode, req.TargetTimeDays, req.TargetTimeMins, req.Repeated
-FROM Requests AS req
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVD' -- CAP/CTM
-) AS hivvd ON req.RequestID = hivvd.RequestID AND req.OBRSetID = hivvd.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVR' -- Viral Load Result
-) AS hivvr ON req.RequestID = hivvr.RequestID AND req.OBRSetID = hivvr.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVC' -- HIV : Viral load (low value) 
-) AS hivvc ON req.RequestID = hivvc.RequestID AND req.OBRSetID = hivvc.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVVF' -- HIV Viral
-) AS hivvf ON req.RequestID = hivvf.RequestID AND req.OBRSetID = hivvf.OBRSetID
-LEFT JOIN (
-	SELECT * FROM LabResults WHERE LIMSObservationCode = 'HIVRL' -- Log Value
-) AS hivrl ON req.RequestID = hivrl.RequestID AND req.OBRSetID = hivrl.OBRSetID
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS limsFacility ON req.LIMSFacilityCode = limsFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS requestingFacility ON req.RequestingFacilityCode = requestingFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS receivingFacility ON req.ReceivingFacilityCode = receivingFacility.FacilityCode
-LEFT JOIN OpenLDRDict.dbo.viewFacilities AS testingFacility ON req.TestingFacilityCode = testingFacility.FacilityCode
-WHERE req.LIMSPanelCode = 'HIVVL'
-
-
-
-
-
-GO
-/****** Object:  UserDefinedFunction [dbo].[getVL_Vendor1_AnalysisDatetime]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE FUNCTION [dbo].[getVL_Vendor1_AnalysisDatetime] (@startDate Date, @endDate Date)
-RETURNS TABLE
-AS RETURN (
--- 2-Oct-17 Brett Staib - Changed query to  get AnalysisDateTime and AuthorisedDateTime from HIVVL rather than from VIRAL panel
-SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, result.HL7SexCode, result.SpecimenDatetime, result.ReceivedDateTime,
- result.AnalysisDateTime, result.AuthorisedDateTime, result.LIMSRejectionCode, result.LIMSRejectionDesc, result.LIMSDateTimeStamp, result.Newborn,
- IsNull(info.Pregnant,'Unreported') AS Pregnant, IsNull(info.BreastFeeding,'Unreported') AS BreastFeeding,
- IsNull(info.FirstTime,'Unreported') AS FirstTime, info.CollectedDate, info.CollectedTime, info.DataDeInicioDoTARV, 
- IsNull(info.PrimeiraLinha, 'Unreported') AS PrimeiraLinha, 
- IsNull(info.SegundaLinha,'Unreported') AS SegundaLinha,
- IsNull(info.ARTRegimen, 'Unreported') AS ARTRegimen, 
- IsNull(info.TypeOfSampleCollection,'Unreported') AS TypeOfSampleCollection,
- IsNull(info.LastViralLoadDate, 'Unreported') AS LastViralLoadDate, 
- IsNull(info.LastViralLoadResult,'Unreported') AS LastViralLoadResult,
- IsNull(info.RequestingClinician, 'Unreported') AS RequestingClinician, 
- result.LIMSVersionstamp, result.LOINCPanelCode, result.HL7PriorityCode, result.AdmitAttendDateTime,  result.CollectionVolume,
- result.LIMSFacilityCode, result.LIMSFacilityName, result.LIMSProvinceName, result.LIMSDistrictName, 
- result.RequestingFacilityCode,  result.RequestingFacilityName,  result.RequestingProvinceName, result.RequestingDistrictName, 
- result.ReceivingFacilityCode,  result.ReceivingFacilityName,  result.ReceivingProvinceName, result.ReceivingDistrictName, 
- result.TestingFacilityCode, result.TestingFacilityName, result.TestingProvinceName, result.TestingDistrictName, 
- result.LIMSPointOfCareDesc,  result.RequestTypeCode, result.ICD10ClinicalInfoCodes, result.ClinicalInfo,
- result.HL7SpecimenSourceCode, result.LIMSSpecimenSourceCode,
- result.LIMSSpecimenSourceDesc, result.HL7SpecimenSiteCode, result.LIMSSpecimenSiteCode, result.LIMSSpecimenSiteDesc, result.WorkUnits, result.CostUnits,
- result.HL7SectionCode, result.HL7ResultStatusCode, result.RegisteredBy, result.TestedBy, result.AuthorisedBy, result.OrderingNotes, result.EncryptedPatientID,
- result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
- result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
- result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
- result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
- result.AgeInYears,
- IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
- CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
- CONCAT(YEAR(result.RegisteredDateTime),'-',Month(result.RegisteredDateTime)) AS RegisteredYearAndMonth
-FROM
--- First get a listing of all RequestIDs that look like they had an actual viral load test requested
-(
-    SELECT DISTINCT Requests.RequestId
-    FROM Requests LEFT JOIN LabResults ON Requests.RequestID = labResults.RequestID AND Requests.OBRSetID = LabResults.OBRSetID
-    WHERE (
-            (Requests.LIMSPanelCode = 'VIRAL')
-            OR (Requests.LIMSPanelCode = 'HIVVL')
-        )
-    AND Requests.AnalysisDateTime Is Not Null
-    AND Requests.AnalysisDatetime >= @startDate AND Requests.AnalysisDatetime < @endDate
-) AS mainRequests
-LEFT JOIN viewVL_Info AS info ON mainRequests.RequestID = info.RequestID
-LEFT JOIN viewVL_Result AS result ON mainRequests.RequestID = result.RequestID
-)
-
-
-GO
-/****** Object:  UserDefinedFunction [dbo].[getVL_Vendor1_WithPatients_DateTimeStamp]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- ########################################################
-CREATE FUNCTION [dbo].[getVL_Vendor1_WithPatients_DateTimeStamp] (@startDate Datetime, @endDate Datetime)
-RETURNS TABLE
-AS RETURN (
--- select * from dbo.[getVL_Vendor1_DateTimeStamp]('2016-09-01','2016-12-01')
--- select * from dbo.[getVL_Vendor1_DateTimeStamp]('2016-01-01','2017-04-01') 
--- The only difference with this function and the RegisteredDatetime function is the sub query selecting RequestIDs
--- So if you are changing one just copy it and change the three column instances 
--- 2-Oct-17 Brett Staib - Changed query to  get AnalysisDateTime and AuthorisedDateTime from HIVVL rather than from VIRAL panel
--- 7-Dec-17 Brettt Staib - Changed the query do no longer have the sub query but instead do straight table joins 
---          It's important to note that I use the table alias result for the view returning the actual test results however,
---          this query starts with requests and does a left join into LabResults so it may have Requests without results but it serves
---          as a list of all requests as well as containing any possible result data. I use this view as the primary list of requests
---          to return because there might not be a row in the Info query if it was missing the Viral query (which is common)
-SELECT patients.RequestID, patients.Versionstamp, patients.[REFNO],patients.[REGISTEREDDATE]
-      ,patients.[LOCATION],patients.[WARD],patients.[HOSPID],patients.[NATIONALITY]
-      ,patients.[NATIONALID],patients.[UNIQUEID], patients.SURNAME, patients.FIRSTNAME, 
-	  patients.[INITIALS],patients.[REFDRCODE],patients.[REFDR],patients.[MEDAID],patients.[MEDAIDNO]
-      ,patients.[BILLACCNO],patients.[TELHOME],patients.[TELWORK],patients.[MOBILE],patients.[EMAIL],
-	  patients.DOB, patients.DOBType, result.AgeInDays, result.HL7SexCode,  result.SpecimenDatetime, result.ReceivedDateTime, result.RegisteredDateTime,
- result.AnalysisDateTime, result.AuthorisedDateTime, result.LIMSRejectionCode, result.LIMSRejectionDesc, result.LIMSDateTimeStamp, result.Newborn,
- IsNull(info.Pregnant,'Unreported') AS Pregnant, IsNull(info.BreastFeeding,'Unreported') AS BreastFeeding,
- IsNull(info.FirstTime,'Unreported') AS FirstTime, info.CollectedDate, info.CollectedTime, info.DataDeInicioDoTARV, 
- IsNull(info.PrimeiraLinha, 'Unreported') AS PrimeiraLinha, 
- IsNull(info.SegundaLinha,'Unreported') AS SegundaLinha,
- IsNull(info.ARTRegimen, 'Unreported') AS ARTRegimen, 
- IsNull(info.TypeOfSampleCollection,'Unreported') AS TypeOfSampleCollection,
- IsNull(info.LastViralLoadDate, 'Unreported') AS LastViralLoadDate, 
- IsNull(info.LastViralLoadResult,'Unreported') AS LastViralLoadResult,
- IsNull(info.RequestingClinician, 'Unreported') AS RequestingClinician, 
- result.LIMSVersionstamp, result.LOINCPanelCode, result.HL7PriorityCode, result.AdmitAttendDateTime, result.CollectionVolume,
- result.LIMSFacilityCode, result.LIMSFacilityName, result.LIMSProvinceName, result.LIMSDistrictName, 
- ISNULL(fac.MohFacilityCode, result.RequestingFacilityCode) RequestingFacilityCode, result.RequestingFacilityName, result.RequestingProvinceName, result.RequestingDistrictName, 
- result.ReceivingFacilityCode, result.ReceivingFacilityName, result.ReceivingProvinceName, result.ReceivingDistrictName, 
- result.TestingFacilityCode, result.TestingFacilityName, result.TestingProvinceName, result.TestingDistrictName, 
- result.LIMSPointOfCareDesc,  result.RequestTypeCode, result.ICD10ClinicalInfoCodes, result.ClinicalInfo,
- result.HL7SpecimenSourceCode, result.LIMSSpecimenSourceCode,
- result.LIMSSpecimenSourceDesc, result.HL7SpecimenSiteCode, result.LIMSSpecimenSiteCode, result.LIMSSpecimenSiteDesc, result.WorkUnits, result.CostUnits,
- result.HL7SectionCode, result.HL7ResultStatusCode, result.RegisteredBy, result.TestedBy, result.AuthorisedBy, result.OrderingNotes, result.EncryptedPatientID,
- result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
- result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
- result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
- result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
- result.AgeInYears,
- IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
- CONCAT(YEAR(result.RegisteredDateTime), '-', DATEPART(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
- CONCAT(YEAR(result.RegisteredDateTime), '-', Month(result.RegisteredDateTime)) AS RegisteredYearAndMonth,
-  --- New Lines
- IIF(info.DateTimeStamp IS NULL OR result.DateTimeStamp IS NULL, ISNULL(info.DateTimeStamp,result.DateTimeStamp), IIF(info.DateTimeStamp < result.DateTimeStamp, info.DateTimeStamp, result.DateTimeStamp)) AS DateTimeStamp,
- dbo.[getHealthCareCode] (result.RequestingFacilityCode) AS HealthcareDistrictCode,
- fac.HealthCareID AS FullHealthCareID
-FROM
--- First get a listing of all RequestIDs that look like they had an actual viral load test requested
-( 
-	SELECT DISTINCT Requests.RequestId
-    FROM Requests LEFT JOIN LabResults ON Requests.RequestID = labResults.RequestID AND Requests.OBRSetID = LabResults.OBRSetID
-    WHERE (
-            (Requests.LIMSPanelCode = 'VIRAL')
-            OR (Requests.LIMSPanelCode = 'HIVVL')
-          )
-    AND (
-		(Requests.DateTimeStamp >= @startDate AND Requests.DateTimeStamp < @endDate)
-		OR
-		(LabResults.DateTimeStamp Is Not Null AND LabResults.DateTimeStamp >= @startDate AND LabResults.DateTimeStamp < @endDate)
-		)
-) AS mainRequests
-LEFT JOIN Patients AS patients ON patients.RequestID = mainRequests.RequestID
-INNER JOIN viewVL_Result AS result ON mainRequests.RequestID = result.RequestID 
-LEFT JOIN viewVL_Info AS info ON result.RequestID = info.RequestID -- AND result.OBRSetID = info.OBRSetID
-LEFT JOIN OpenLDRDict.dbo.Facilities AS fac ON info.RequestingFacilityCode = fac.FacilityCode
-)
-
-GO
-/****** Object:  UserDefinedFunction [dbo].[getVL_Vendor1_RegisteredDatetime]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE FUNCTION [dbo].[getVL_Vendor1_RegisteredDatetime] (@startDate Date, @endDate Date)
-RETURNS TABLE
-AS RETURN (
--- select * from dbo.getVL_Vendor1_RegisteredDatetime(DATEADD(DAY, -90, CURRENT_TIMESTAMP ), CURRENT_TIMESTAMP)
--- 2-Oct-17 Brett Staib - Changed query to  get AnalysisDateTime and AuthorisedDateTime from HIVVL rather than from VIRAL panel
--- 24-Jul-19 Brett Staib - updated query that retreives RequestIDs to not join in labresults; no need for it; it was just in there from cutting and pasting from DatetimeStamp view
-SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, result.HL7SexCode, result.SpecimenDatetime, result.ReceivedDateTime,
- result.AnalysisDateTime, result.AuthorisedDateTime, result.LIMSRejectionCode, result.LIMSRejectionDesc, result.LIMSDateTimeStamp, result.Newborn,
- IsNull(info.Pregnant,'Unreported') AS Pregnant, IsNull(info.BreastFeeding,'Unreported') AS BreastFeeding,
- IsNull(info.FirstTime,'Unreported') AS FirstTime, info.CollectedDate, info.CollectedTime, info.DataDeInicioDoTARV, 
- IsNull(info.PrimeiraLinha, 'Unreported') AS PrimeiraLinha, 
- IsNull(info.SegundaLinha,'Unreported') AS SegundaLinha,
- IsNull(info.ARTRegimen, 'Unreported') AS ARTRegimen, 
- IsNull(info.TypeOfSampleCollection,'Unreported') AS TypeOfSampleCollection,
- IsNull(info.LastViralLoadDate, 'Unreported') AS LastViralLoadDate, 
- IsNull(info.LastViralLoadResult,'Unreported') AS LastViralLoadResult,
- IsNull(info.RequestingClinician, 'Unreported') AS RequestingClinician, 
- IsNull(info.ConsentimentoParaContacto, 'Unreported') AS ConsentimentoParaContacto, 
- IsNull(info.LocalDeColheita, 'Unreported') AS LocalDeColheita, 
- result.LIMSVersionstamp, result.LOINCPanelCode, result.HL7PriorityCode, result.AdmitAttendDateTime,  result.CollectionVolume,
- result.LIMSFacilityCode, result.LIMSFacilityName, result.LIMSProvinceName, result.LIMSDistrictName, 
- result.RequestingFacilityCode,  result.RequestingFacilityName,  result.RequestingProvinceName, result.RequestingDistrictName, 
- result.ReceivingFacilityCode,  result.ReceivingFacilityName,  result.ReceivingProvinceName, result.ReceivingDistrictName, 
- result.TestingFacilityCode, result.TestingFacilityName, result.TestingProvinceName, result.TestingDistrictName, 
- result.LIMSPointOfCareDesc,  result.RequestTypeCode, result.ICD10ClinicalInfoCodes, result.ClinicalInfo,
- result.HL7SpecimenSourceCode, result.LIMSSpecimenSourceCode,
- result.LIMSSpecimenSourceDesc, result.HL7SpecimenSiteCode, result.LIMSSpecimenSiteCode, result.LIMSSpecimenSiteDesc, result.WorkUnits, result.CostUnits,
- result.HL7SectionCode, result.HL7ResultStatusCode, result.RegisteredBy, result.TestedBy, result.AuthorisedBy, result.OrderingNotes, result.EncryptedPatientID,
- result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
- result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
- result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
- [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
- result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM, 
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
- result.AgeInYears,
- IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
- CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
- CONCAT(YEAR(result.RegisteredDateTime),'-',Month(result.RegisteredDateTime)) AS RegisteredYearAndMonth
-FROM
-(
-    SELECT DISTINCT Requests.RequestId
-    FROM Requests 
-	WHERE (
-            (Requests.LIMSPanelCode = 'VIRAL')
-            OR (Requests.LIMSPanelCode = 'HIVVL')
-        )
-    AND Requests.RegisteredDateTime Is Not Null
-    AND Requests.RegisteredDatetime >= @startDate AND Requests.RegisteredDatetime < @endDate
-) AS mainRequests
-LEFT JOIN viewVL_Info AS info ON mainRequests.RequestID = info.RequestID
-LEFT JOIN viewVL_Result AS result ON mainRequests.RequestID = result.RequestID
-)
-
-
-GO
-/****** Object:  UserDefinedFunction [dbo].[getVL_Vendor1_DateTimeStamp]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-
-CREATE FUNCTION [dbo].[getVL_Vendor1_DateTimeStamp] (@startDate Date, @endDate Date)
-RETURNS TABLE
-AS RETURN (
--- select * from dbo.getVL_Vendor1_DateTimeStamp(DATEADD(DAY, -90, CURRENT_TIMESTAMP ), CURRENT_TIMESTAMP)
--- select * from dbo.[getVL_Vendor1_DateTimeStamp]('2016-09-01','2016-12-01')
--- select * from dbo.[getVL_Vendor1_DateTimeStamp]('2016-01-01','2017-04-01') 
--- The only difference with this function and the RegisteredDatetime function is the sub query selecting RequestIDs
--- So if you are changing one just copy it and change the three column instances 
--- 2-Oct-17 Brett Staib - Changed query to  get AnalysisDateTime and AuthorisedDateTime from HIVVL rather than from VIRAL panel
--- 7-Dec-17 Brett Staib - Changed the query do no longer have the sub query but instead do straight table joins 
---          It's important to note that I use the table alias result for the view returning the actual test results however,
---          this query starts with requests and does a left join into LabResults so it may have Requests without results but it serves
---          as a list of all requests as well as containing any possible result data. I use this view as the primary list of requests
---          to return because there might not be a row in the Info query if it was missing the Viral query (which is common)
--- 24-Jul-19 Brett Staib - Removed the function call to get the RequestIDs and put the SQL directly in this query. It doesn't
---           allow you have all related queries use the same exact list but the performance improvement is worth it (2:30->:56) 
-SELECT 	mainRequests.RequestID, result.AgeInDays, result.RegisteredDateTime, result.HL7SexCode, result.SpecimenDatetime, result.ReceivedDateTime,
- result.AnalysisDateTime, result.AuthorisedDateTime, result.LIMSRejectionCode, result.LIMSRejectionDesc, result.LIMSDateTimeStamp, result.Newborn,
- IsNull(info.Pregnant,'Unreported') AS Pregnant, IsNull(info.BreastFeeding,'Unreported') AS BreastFeeding,
- IsNull(info.FirstTime,'Unreported') AS FirstTime, info.CollectedDate, info.CollectedTime, info.DataDeInicioDoTARV, 
- IsNull(info.PrimeiraLinha, 'Unreported') AS PrimeiraLinha, 
- IsNull(info.SegundaLinha,'Unreported') AS SegundaLinha,
- IsNull(info.ARTRegimen, 'Unreported') AS ARTRegimen, 
- IsNull(info.TypeOfSampleCollection,'Unreported') AS TypeOfSampleCollection,
- IsNull(info.LastViralLoadDate, 'Unreported') AS LastViralLoadDate, 
- IsNull(info.LastViralLoadResult,'Unreported') AS LastViralLoadResult,
- IsNull(info.RequestingClinician, 'Unreported') AS RequestingClinician, 
- IsNull(info.ConsentimentoParaContacto, 'Unreported') AS ConsentimentoParaContacto, 
- IsNull(info.LocalDeColheita, 'Unreported') AS LocalDeColheita, 
- result.LIMSVersionstamp, result.LOINCPanelCode, result.HL7PriorityCode, result.AdmitAttendDateTime,  result.CollectionVolume,
- result.LIMSFacilityCode, result.LIMSFacilityName, result.LIMSProvinceName, result.LIMSDistrictName, 
- result.RequestingFacilityCode,  result.RequestingFacilityName,  result.RequestingProvinceName, result.RequestingDistrictName, 
- result.ReceivingFacilityCode,  result.ReceivingFacilityName,  result.ReceivingProvinceName, result.ReceivingDistrictName, 
- result.TestingFacilityCode, result.TestingFacilityName, result.TestingProvinceName, result.TestingDistrictName, 
- result.LIMSPointOfCareDesc,  result.RequestTypeCode, result.ICD10ClinicalInfoCodes, result.ClinicalInfo,
- result.HL7SpecimenSourceCode, result.LIMSSpecimenSourceCode,
- result.LIMSSpecimenSourceDesc, result.HL7SpecimenSiteCode, result.LIMSSpecimenSiteCode, result.LIMSSpecimenSiteDesc, result.WorkUnits, result.CostUnits,
- result.HL7SectionCode, result.HL7ResultStatusCode, result.RegisteredBy, result.TestedBy, result.AuthorisedBy, result.OrderingNotes, result.EncryptedPatientID,
- result.HL7EthnicGroupCode, result.Deceased, result.HL7PatientClassCode, result.AttendingDoctor,
- result.ReferringRequestID, result.Therapy, result.LIMSAnalyzerCode, result.TargetTimeDays, result.TargetTimeMins, result.Repeated,
- result.HIVVL_AuthorisedDateTime, result.HIVVL_LIMSRejectionCode, result.HIVVL_LIMSRejectionDesc, result.HIVVL_VRLogValue,
-  [dbo].[ViralLoadResultRange] (HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral))) AS ViralLoadResultCategory,
- result.HIVVL_ViralLoadResult, ISNULL(result.HIVVL_ViralLoadCAPCTM, ISNULL(result.HIVVL_Low_value, result.HIVVL_Viral)) HIVVL_ViralLoadCAPCTM,  
- [dbo].[GetAgeGroup](result.AgeInYears) AS AgeGroup,
- result.AgeInYears,
- IsNull(info.ReasonForTest,'Reason Not Specified') AS ReasonForTest,
- CONCAT(YEAR(result.RegisteredDateTime), '-', DatePart(QUARTER, result.RegisteredDateTime)) AS RegisteredYearAndQuarter,
- CONCAT(YEAR(result.RegisteredDateTime),'-',Month(result.RegisteredDateTime)) AS RegisteredYearAndMonth
-FROM
--- First get a listing of all RequestIDs that look like they had an actual viral load test requested
-( 
-	SELECT DISTINCT Requests.RequestId
-    FROM Requests LEFT JOIN LabResults ON Requests.RequestID = labResults.RequestID AND Requests.OBRSetID = LabResults.OBRSetID
-    WHERE (
-            (Requests.LIMSPanelCode = 'VIRAL')
-            OR (Requests.LIMSPanelCode = 'HIVVL')
-          )
-    AND (
-		(Requests.DateTimeStamp >= @startDate AND Requests.DateTimeStamp < @endDate)
-		OR
-		(LabResults.DateTimeStamp Is Not Null AND LabResults.DateTimeStamp >= @startDate AND LabResults.DateTimeStamp < @endDate)
-		)
-) AS mainRequests
--- getRequestIDsWithUpdatedDateTimeStamp(@startDate, @endDate) 
-INNER JOIN viewVL_Result AS result ON mainRequests.RequestID = result.RequestID 
-LEFT JOIN viewVL_Info AS info ON result.RequestID = info.RequestID -- AND result.OBRSetID = info.OBRSetID
-)
-
-
-GO
-
-
-
 
 
 INSERT INTO [dbo].[VersionControl] VALUES(GETDATE(),GETDATE(),null,null,null,'1.0.1')
