@@ -1,7 +1,7 @@
 
 IF NOT EXISTS(select * from sys.databases where name='OpenLDRData')
 BEGIN
-	PRINT 'The database OpenLDRData doesn''t exist' 
+	PRINT 'The database OpenLDRData doesn''t exist'
 	RETURN 
 END
 GO
@@ -179,26 +179,6 @@ BEGIN
     RETURN(@OutString);
 
 END;
-
-
-GO
-/****** Object:  UserDefinedFunction [dbo].[ufn_GetAgeGroupJSON]    Script Date: 27/08/2019 09:09:35 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE FUNCTION [dbo].[ufn_GetAgeGroupJSON] (@alias nvarchar(50))
-RETURNS nvarchar(1000)
-AS
-BEGIN
-RETURN REPLACE(N'{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365) IS NULL","then":"''N '''' Especif.''","alias":"' + @alias + '"}
-,{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365)  < 2","then":"''< 2 Anos''","alias":"' + @alias + '"}
-,{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365)  <= 5","then":"''2-5 Anos''","alias":"' + @alias + '"}
-,{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365)  <= 14","then":"''6-14 Anos''","alias":"' + @alias + '"}
-,{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365)  <= 49","then":"''15-49 Anos''","alias":"' + @alias + '"}
-,{"when":"COALESCE(Requests.AgeInYears, Requests.AgeInDays/365)  > 49","then":"''>= 50 Anos''","alias":"' + @alias + '"}
-,{"else":"''N '''' Especif.''","alias":"' + @alias + '"}', Char(13)+Char(10), '')
-END
 
 
 GO
