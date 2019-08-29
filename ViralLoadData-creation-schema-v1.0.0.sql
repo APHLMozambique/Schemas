@@ -3,6 +3,12 @@ GO
 
 IF EXISTS(select * from sys.databases where name='ViralLoadData')
 BEGIN
+	IF EXISTS (SELECT * FROM ViralLoadData.dbo.VersionControl WHERE VersionStamp = '1.0.0')
+	BEGIN
+		set nocount on
+			PRINT 'The database ViralLoadData already exists'
+        	set nocount off
+	END
 	EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'ViralLoadData'
 	ALTER DATABASE [ViralLoadData] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE
 	DROP DATABASE [ViralLoadData]
