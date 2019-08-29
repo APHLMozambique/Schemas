@@ -1,6 +1,14 @@
+
+
 use master
 IF EXISTS(select * from sys.databases where name='OpenLDRData')
 BEGIN
+	IF EXISTS (SELECT * FROM OpenLDRData.dbo.VersionControl WHERE VersionStamp = '1.0.0')
+	BEGIN
+		set nocount on
+			PRINT 'The database OpenLDRData already exists'
+        	set nocount off
+	END
 	EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'OpenLDRData'
 	ALTER DATABASE [OpenLDRData] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE
 	DROP DATABASE [OpenLDRData]
